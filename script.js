@@ -3,21 +3,23 @@ const bgMusic = document.getElementById('bgMusic');
 // Auto-play music when page loads with lower volume
 window.addEventListener('load', () => {
     bgMusic.volume = 0.3;  // Set volume to 30%
+    bgMusic.currentTime = 2;  // Skip langsung ke detik ke-1
     bgMusic.play().catch(console.log);
+
 });
 
 const messages = [
     {
-        text: "gatau si",
-        image: "4.png"
+        text: "masa sii,affah iyahh?",
+        image: "4.jpeg"
     },
     {
-        text: "plsss klik yg kiiiriiii",
-        image: "1.png"
+        text: "plsss klik yg kirii donggg",
+        image: "1.jpeg"  
     },
     {
-        text: "terakhir, kalo \"ga\" ywd deh",
-        image: "2.png"
+        text: "terakhir, kalo \"ga\" ywdh deh",
+        image: "2.jpeg"
     }
 ];
 
@@ -121,12 +123,29 @@ function getFarPosition(containerRect, windowWidth, windowHeight, buttonWidth, b
 }
 
 yesBtn.addEventListener('click', () => {
-    title.innerHTML = " yaa kan km emng manisss";
+    title.innerHTML = " yaa kan kmuu emng manisss";
     document.querySelector('img').src = "3.png";
     noBtn.style.display = 'none';
     yesBtn.style.display = 'none';
     bgMusic.play();
+
+    // 🌸 BURST: bunga jatuh banyak di awal
+    for (let i = 0; i < 30; i++) {
+        setTimeout(createFallingLily, i * 200);
+    }
+
+    // 🌼 Bunga static muncul acak terus menerus
+    for (let i = 0; i < 10; i++) {
+        setTimeout(createStaticLilyLoop, i * 300);
+    }
+
+    // 🌀 HUJAN ABADI: bunga jatuh pelan-pelan terus
+    setInterval(() => {
+        createFallingLily();
+    }, 500); // setiap 3 detik muncul satu kelopak jatuh
 });
+
+
 
 noBtn.addEventListener('click', () => {
     if (noCount < 3) {
@@ -134,18 +153,19 @@ noBtn.addEventListener('click', () => {
         title.innerHTML = messages[noCount - 1].text;
         document.querySelector('img').src = messages[noCount - 1].image;
     } else {
-        title.innerHTML = "TAPI BOONG HEHEHE";
-        if (!noBtn.classList.contains('running')) {
-            noBtn.classList.add('running');
-        }
-        // Always run away on click after 3 clicks
-        runAway({ 
-            target: noBtn, 
-            type: 'click',
-            clientX: event.clientX || event.touches?.[0]?.clientX,
-            clientY: event.clientY || event.touches?.[0]?.clientY
-        });
+    title.innerHTML = "EITSS TAPI BOONG HEHEHE";
+    document.querySelector('img').src = "7.jpeg"; // tambahkan ini
+    if (!noBtn.classList.contains('running')) {
+        noBtn.classList.add('running');
     }
+    runAway({ 
+        target: noBtn, 
+        type: 'click',
+        clientX: event.clientX || event.touches?.[0]?.clientX,
+        clientY: event.clientY || event.touches?.[0]?.clientY
+    });
+}
+
 });
 
 // Make button run away on hover/touch
@@ -160,3 +180,101 @@ const handleButtonDodge = (e) => {
 noBtn.addEventListener('mouseover', handleButtonDodge);
 noBtn.addEventListener('touchstart', handleButtonDodge, { passive: false });
 noBtn.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+function createLilies() {
+    const lily = document.createElement('img');
+    lily.src = 'lily.png';
+    lily.className = 'falling-lily';
+    lily.style.position = 'fixed';
+    lily.style.width = '30px';
+    lily.style.left = Math.random() * 100 + 'vw';
+    lily.style.top = '-50px';
+    lily.style.opacity = '0.9';
+    lily.style.pointerEvents = 'none';
+    lily.style.zIndex = '999';
+    lily.style.transition = 'transform 6s ease-in, opacity 6s ease-in';
+
+    document.body.appendChild(lily);
+
+    requestAnimationFrame(() => {
+        lily.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
+        lily.style.opacity = '0';
+    });
+
+    setTimeout(() => {
+        lily.remove();
+    }, 7000);
+}
+
+function createFallingLily() {
+    const lily = document.createElement('img');
+    lily.src = 'lily2.png'; // Ganti ke file baru
+    lily.className = 'falling-lily';
+    lily.style.left = Math.random() * 100 + 'vw';
+    lily.style.top = '-50px';
+    lily.style.width = '30px';
+    lily.style.opacity = '0.9';
+    lily.style.pointerEvents = 'none';
+    lily.style.filter = ' saturate(3.2) contrast(6.2) '; // Tambahkan filter
+    lily.style.zIndex = '999';
+    lily.style.transition = 'transform 9s ease-in, opacity 9s ease-in'; // was 6s
+
+
+    document.body.appendChild(lily);
+
+    requestAnimationFrame(() => {
+        lily.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
+        lily.style.opacity = '0';
+    });
+
+    setTimeout(() => {
+        lily.remove();
+    }, 10000);
+}
+
+
+function createStaticLilyLoop() {
+    const lily = document.createElement('img');
+    lily.src = 'lily.png';
+    lily.className = 'static-lily';
+    lily.style.filter = ' saturate(2.2) contrast(3.2) '; 
+    // Posisi random
+    lily.style.left = Math.random() * 100 + 'vw';
+    lily.style.top = Math.random() * 100 + 'vh';
+    document.body.appendChild(lily);
+
+    // Muncul
+    setTimeout(() => {
+        lily.style.opacity = '1';
+    }, 50);
+
+    // Hilang pelan-pelan
+    setTimeout(() => {
+        lily.style.opacity = '0';
+    }, 2000);
+
+    // Hapus & buat lagi
+    setTimeout(() => {
+        lily.remove();
+        createStaticLilyLoop(); // panggil lagi untuk loop
+    }, 3000);
+}
+
+
+function getRandomPositionOutsideContainer() {
+    const container = document.querySelector('.container');
+    const containerRect = container.getBoundingClientRect();
+
+    let x, y;
+
+    // Loop sampe dapet posisi yang nggak nabrak container
+    do {
+        x = Math.random() * window.innerWidth;
+        y = Math.random() * window.innerHeight;
+    } while (
+        x > containerRect.left - 50 && x < containerRect.right + 50 &&
+        y > containerRect.top - 50 && y < containerRect.bottom + 50
+    );
+
+    return { x, y };
+}

@@ -173,3 +173,22 @@ img {
         font-size: 1rem;
     }
 }
+
+.falling-lily {
+    position: fixed;
+    top: -50px;
+    width: 30px;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 999;
+    transition: transform 6s ease-in, opacity 6s ease-in;
+}
+
+.static-lily {
+    position: fixed;
+    width: 30px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    transition: opacity 1s ease-in;
+}
