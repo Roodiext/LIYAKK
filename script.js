@@ -5,7 +5,6 @@ window.addEventListener('load', () => {
     bgMusic.volume = 0.3;  // Set volume to 30%
     bgMusic.currentTime = 2;  // Skip langsung ke detik ke-1
     bgMusic.play().catch(console.log);
-
 });
 
 const messages = [
@@ -40,11 +39,11 @@ setInterval(() => createHeart(), 300);
     img.src = src;
 });
 
-
 const title = document.querySelector('.title');
 const noBtn = document.querySelector('.no-btn');
 const yesBtn = document.querySelector('.yes-btn');
 let noCount = 0;
+let isRunning = false; // Flag untuk mencegah multiple execution
 
 function runAway(e) {
     const noButton = e.target;
@@ -151,37 +150,41 @@ yesBtn.addEventListener('click', () => {
     }, 500); // setiap 3 detik muncul satu kelopak jatuh
 });
 
+// PERBAIKAN UTAMA: Pisahkan logic untuk click event
+noBtn.addEventListener('click', (e) => {
+    // Jika sudah dalam mode running, cegah click dan jalankan runAway
+    if (isRunning) {
+        e.preventDefault();
+        e.stopPropagation();
+        runAway(e);
+        return; // PENTING: keluar dari function, jangan lanjut ke logic dibawah
+    }
 
-
-noBtn.addEventListener('click', () => {
+    // Logic untuk noCount < 3 (belum running)
     if (noCount < 3) {
         noCount++;
         title.innerHTML = messages[noCount - 1].text;
         document.querySelector('img').src = messages[noCount - 1].image;
     } else {
-    title.innerHTML = "EITSS TAPI BOONG HEHEHE";
-    document.querySelector('img').src = "7.jpeg";
-
-    setTimeout(() => {
-        if (!noBtn.classList.contains('running')) {
-            noBtn.classList.add('running');
-        }
-
-        runAway({ 
-            target: noBtn, 
-            type: 'click',
-            clientX: event.clientX || event.touches?.[0]?.clientX || 0,
-            clientY: event.clientY || event.touches?.[0]?.clientY || 0
-        });
-    }, 100); // kasih delay biar update teks & gambar selesai dulu
-}
-
-
+        // noCount >= 3, masuk ke mode running
+        title.innerHTML = "EITSS TAPI BOONG HEHEHE";
+        document.querySelector('img').src = "7.jpeg";
+        
+        // Set flag running
+        isRunning = true;
+        
+        setTimeout(() => {
+            if (!noBtn.classList.contains('running')) {
+                noBtn.classList.add('running');
+            }
+            runAway(e);
+        }, 100);
+    }
 });
 
-// Make button run away on hover/touch
+// Make button run away on hover/touch - HANYA jika sudah running
 const handleButtonDodge = (e) => {
-    if (noCount >= 3) {
+    if (isRunning) { // Gunakan flag isRunning instead of noCount >= 3
         e.preventDefault();
         e.stopPropagation();
         runAway(e);
@@ -190,7 +193,11 @@ const handleButtonDodge = (e) => {
 
 noBtn.addEventListener('mouseover', handleButtonDodge);
 noBtn.addEventListener('touchstart', handleButtonDodge, { passive: false });
-noBtn.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+noBtn.addEventListener('touchmove', (e) => {
+    if (isRunning) {
+        e.preventDefault();
+    }
+}, { passive: false });
 
 function createLilies() {
     const lily = document.createElement('img');
@@ -230,7 +237,6 @@ function createFallingLily() {
     lily.style.zIndex = '999';
     lily.style.transition = 'transform 9s ease-in, opacity 9s ease-in'; // was 6s
 
-
     document.body.appendChild(lily);
 
     requestAnimationFrame(() => {
@@ -242,7 +248,6 @@ function createFallingLily() {
         lily.remove();
     }, 10000);
 }
-
 
 function createStaticLilyLoop() {
     const lily = document.createElement('img');
@@ -270,7 +275,6 @@ function createStaticLilyLoop() {
         createStaticLilyLoop(); // panggil lagi untuk loop
     }, 3000);
 }
-
 
 function getRandomPositionOutsideContainer() {
     const container = document.querySelector('.container');
