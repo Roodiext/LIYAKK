@@ -160,17 +160,22 @@ noBtn.addEventListener('click', () => {
         document.querySelector('img').src = messages[noCount - 1].image;
     } else {
     title.innerHTML = "EITSS TAPI BOONG HEHEHE";
-    document.querySelector('img').src = "7.jpeg"; // tambahkan ini
-    if (!noBtn.classList.contains('running')) {
-        noBtn.classList.add('running');
-    }
-    runAway({ 
-        target: noBtn, 
-        type: 'click',
-        clientX: event.clientX || event.touches?.[0]?.clientX,
-        clientY: event.clientY || event.touches?.[0]?.clientY
-    });
+    document.querySelector('img').src = "7.jpeg";
+
+    setTimeout(() => {
+        if (!noBtn.classList.contains('running')) {
+            noBtn.classList.add('running');
+        }
+
+        runAway({ 
+            target: noBtn, 
+            type: 'click',
+            clientX: event.clientX || event.touches?.[0]?.clientX || 0,
+            clientY: event.clientY || event.touches?.[0]?.clientY || 0
+        });
+    }, 100); // kasih delay biar update teks & gambar selesai dulu
 }
+
 
 });
 
